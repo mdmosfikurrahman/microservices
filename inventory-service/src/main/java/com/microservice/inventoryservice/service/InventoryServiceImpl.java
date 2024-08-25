@@ -7,12 +7,15 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class InventoryServiceImpl implements InventoryService{
+public class InventoryServiceImpl implements InventoryService {
 
     private final InventoryRepository inventoryRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public boolean isInStock(String skuCode) {
-        return inventoryRepository.findBySkuCode(skuCode).isPresent();
+        return inventoryRepository.findBySkuCode(skuCode)
+                .map(inventory -> inventory.getQuantity() > 0)
+                .orElse(false);
     }
 }
